@@ -28,7 +28,6 @@ export default {
       this.hideTitleAndMenu()
     },
     toggleTitleAndMenu() {
-      console.log(this.menuVisible)
       // this.$store.dispatch('book/setMenuVisible', !this.menuVisible)
       this.setMenuVisible(!this.menuVisible)
     },

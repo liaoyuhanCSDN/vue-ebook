@@ -4,6 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'hash',
   routes: [
     {
       path: '/',
@@ -11,7 +12,7 @@ export default new Router({
     },
     {
       path: '/ebook',
-      component: () => import('./views/ebook'),
+      component: () => import('@/views/ebook'),
       children: [
         {
           path: ':fileName',

@@ -49,7 +49,7 @@ export default {
   line-height: px2rem(48);
   font-size: px2rem(22);
   .left {
-    flex: 0 0 px2rem(37);
+    flex: 0 0 px2rem(60);
     margin-left: px2rem(15);
   }
   .right {

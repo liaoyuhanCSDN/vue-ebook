@@ -8,7 +8,14 @@
 
 <script>
 import { ebookMixin } from "@/utils/mixin";
-import { getFontFamily, saveFontFamily } from "@/utils/localStorage";
+import {
+  getFontFamily,
+  saveFontFamily,
+  getFontSize,
+  saveFontSize,
+  getTheme,
+  saveTheme
+} from "@/utils/localStorage";
 import Epub from "epubjs";
 global.ePub = Epub;
 export default {
@@ -23,6 +30,36 @@ export default {
     ).then(() => this.initEpub());
   },
   methods: {
+    initTheme() {
+      let defaultTheme = getTheme(this.fileName)
+      if (!defaultTheme) {
+        defaultTheme = this.themeList[0].name
+        saveTheme(this.fileName,defaultTheme)
+      }
+      this.setDefaultTheme(defaultTheme)
+      this.themeList.forEach(theme => {
+        this.rendition.themes.register(theme.name,theme.style)
+      })
+      this.rendition.themes.select(defaultTheme)
+    },
+    initFontSize() {
+      const fontSize = getFontSize(this.fileName);
+      if (!fontSize) {
+        saveFontSize(this.fileName, this.defaultFontSize);
+      } else {
+        this.rendition.themes.fontSize(fontSize);
+        this.setDefaultFontSize(fontSize)
+      }
+    },
+    initFontFamily() {
+       const font = getFontFamily(this.fileName);
+        if (!font) {
+          saveFontFamily(this.fileName, this.defaultFontFamily);
+        } else {
+          this.rendition.themes.font(font);
+          this.setDefaultFontFamily(font)
+        }
+    },
     prevPage() {
       if (this.rendition) this.rendition.prev();
       this.hideTitleAndMenu();
@@ -44,7 +81,7 @@ export default {
       this.setFontFamilyVisible(false);
     },
     initEpub() {
-      const url = `http://10.108.142.72:8081/epub/${this.fileName}.epub`;
+      const url = `${process.env.VUE_APP_RES_URL}/epub/${this.fileName}.epub`;
       this.book = new Epub(url);
       this.setCurrentBook(this.book);
       this.rendition = this.book.renderTo("read", {
@@ -53,12 +90,10 @@ export default {
         method: "default"
       });
       this.rendition.display().then(() => {
-        const font = getFontFamily(this.fileName);
-        if (!font) {
-          saveFontFamily(this.fileName, this.defaultFontFamily);
-        } else {
-          this.rendition.themes.font(font);
-        }
+        this.initFontSize()
+        this.initFontFamily()
+        this.initTheme()
+        this.setGlobalStyle()
       });
       this.rendition.on("touchstart", even => {
         this.touchStartX = event.changedTouches[0].clientX;
@@ -91,7 +126,7 @@ export default {
           contents.addStylesheet(
             `${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`
           )
-        ]).then(() => {});
+        ]).then(() => { });
       });
     }
   }
